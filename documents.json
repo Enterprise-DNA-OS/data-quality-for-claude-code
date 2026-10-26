@@ -1,11 +1,52 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
-    "file": "name",
+    "name": "quality-review",
+    "title": "Dataset quality review",
+    "for_each": "select id,code from datasets order by code",
+    "file": "code",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Purpose and owner",
+        "layout": "record",
+        "sql": "select code,name,owner,purpose,personal,review_due,max_age_hours from datasets where id=$1"
+      },
+      {
+        "title": "Evidence gaps",
+        "sql": "select rule,finding from v_compliance where dataset_id=$1"
+      },
+      {
+        "title": "Use-review evidence",
+        "sql": "select reviewer,purpose,evidence,created_at,expires_at from use_reviews where dataset_id=$1 order by created_at desc"
+      }
+    ]
+  },
+  {
+    "name": "corrective-action",
+    "title": "Corrective action record",
+    "for_each": "select id,code from actions order by code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Action and closure evidence",
+        "layout": "record",
+        "sql": "select code,name,owner,due,status,evidence,closed_at from actions where id=$1"
+      }
+    ]
+  },
+  {
+    "name": "check-register",
+    "title": "Quality check register",
+    "for_each": "select id,code from datasets order by code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Rule definitions",
+        "sql": "select code,name,kind,field,lower_bound,upper_bound,allowed,max_failures,severity,enabled from rules where dataset_id=$1 order by code"
+      },
+      {
+        "title": "Check history",
+        "sql": "select check_name,origin,measured_at,actual_value,failed_rows,severity from results where dataset_id=$1 order by measured_at desc"
+      }
     ]
   }
 ]

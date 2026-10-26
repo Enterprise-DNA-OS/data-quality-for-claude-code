@@ -1,0 +1,4 @@
+order_id,quantity,status
+ORD-101,4,open
+ORD-102,0,open
+ORD-103,2,pending

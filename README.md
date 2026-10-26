@@ -1,115 +1,99 @@
-<h1 align="center">Data Quality for Claude Code</h1>
+# Data Quality for Claude Code
 
-<p align="center">
-  <strong>The open-source data quality desk that is just a database and Claude Code.</strong>
-</p>
+Check business extracts, keep the evidence and put each correction with an owner. Your rules and history live in one database.
 
-<p align="center">
-  Created by <a href="https://www.enterprisedna.co"><strong>Enterprise DNA</strong></a>. Free and open source. Works with Claude Code, Codex, OpenCode or Cursor.
-</p>
+| Do it yourself | We customise it | We run it for you |
+|---|---|---|
+| Free MIT code. Install and operate it yourself. | Your rules, records, reports and connections. | Installed and operated through Omni by Enterprise DNA. |
+| [Quick start](#quick-start) | One setup fee, then a retainer. [Build our version](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=dqops) | One setup fee, then a retainer. [Talk to Sam](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=dqops) |
 
-<!-- three-doors -->
-<table align="center">
-  <tr>
-    <td align="center"><strong>Do it yourself</strong><br/>Clone it, run it, own it. Free, MIT.<br/><a href="#quick-start">Quick start</a></td>
-    <td align="center"><strong>We customise it</strong><br/>Your fields, your rules, your DQOps data brought across.<br/><a href="https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=dqops">Book a call</a></td>
-    <td align="center"><strong>We run it for you</strong><br/>Installed, connected and operated inside Omni. Setup fee, then a retainer.<br/><a href="https://enterprisedna.co/omni/instead-of/dqops?utm_source=github&utm_medium=readme&utm_campaign=dqops">How it works</a></td>
-  </tr>
-</table>
+## The annual bill
 
-<p align="center">
-  <a href="#what-is-this">What is this</a> &bull;
-  <a href="#why-no-front-end">Why no front end</a> &bull;
-  <a href="#quick-start">Quick start</a> &bull;
-  <a href="#the-commands">Commands</a> &bull;
-  <a href="#instead-of-dqops">Instead of DQOps</a> &bull;
-  <a href="#want-it-installed-and-run-for-you">Installed for you</a> &bull;
-  <a href="#license">License</a>
-</p>
+[DQOps Team](https://dqops.com/pricing) lists $2,000 a month billed annually, equivalent to $24,000 a year, checked 26 October 2026. The page uses a dollar sign without naming the currency. Confirm currency and taxes in your quote. Personal is $600 a month billed annually. Enterprise is quoted. These are published rates, not a customer's invoice.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Node-20+-339933?style=flat-square" alt="Node 20+" />
-  <img src="https://img.shields.io/badge/PostgreSQL-any-336791?style=flat-square" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/PGlite-embedded-3ecf8e?style=flat-square" alt="PGlite" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
-</p>
-
----
-
-## What is this
-
-Data Quality for Claude Code does the job you pay DQOps for, as a Postgres database and a set of agent commands. There is no web front end. You open the folder in [Claude Code](https://claude.com/claude-code) (or Codex, OpenCode, Cursor: see `AGENTS.md`) and ask for what you want in plain language. It runs the right query, and it can answer questions the DQOps dashboard cannot.
-
-<!-- TODO(author): the annual bill. One sentence: what a 10 to 50 person business typically pays DQOps per year, all in, with a source. -->
-
-Want the same thing with a web front end, or built on a different stack? That is a customisation, and it is exactly what Enterprise DNA does: [book a call](https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=dqops).
-
-<!-- TODO(author): two or three sentences on what this specific product covers and who it is for. -->
-
-## Why no front end
-
-- The front end was only ever there because the database was hard to talk to. That is no longer true.
-- Your data sits in plain Postgres tables you own. Any tool can read them. No export, no lock-in.
-- No seats, no tiers, no add-ons. Read [docs/why-no-front-end.md](docs/why-no-front-end.md) for the honest trade-offs too.
+DQOps itself is open source and offers a much broader monitoring platform. This independent project replaces a bounded workflow: checks on CSV extracts, historical check-result imports, corrective actions and evidence before records are used. It does not reproduce DQOps' warehouse connectors, scheduling engine or complete check library. Compare your actual workload before switching.
 
 ## Quick start
 
-Sixty seconds, no database install (an embedded Postgres runs inside Node):
+Node 20 or later. PGlite runs locally without a server. Postgres 15 or later supports a shared deployment.
 
 ```bash
 git clone https://github.com/Enterprise-DNA-OS/data-quality-for-claude-code.git
 cd data-quality-for-claude-code
 npm install
+npm test
 npm run demo
+npm run view
+npm run docs
+node scripts/quality.mjs help
 ```
 
-Then open the folder in Claude Code and type a slash command. <!-- TODO(author): name the first command to try. -->
+The demo is fictional. It deliberately has duplicated contact references, a missing email, a zero order quantity, an unfamiliar status, overdue corrections and stock data without a current check. Seeding is idempotent and dates are relative to the first seed. For real data, start with an empty DATA_DIR and migrate without seeding.
 
-### Use it with your own Postgres or Supabase
+## The weekly work
 
-Copy `.env.example` to `.env`, set `DATABASE_URL`, then `npm run migrate`. Same commands, shared data, no per-seat fee.
+- `/quality-week`: owners, review dates, last checks and open corrections.
+- `/check-file`: check a CSV against the dataset's active rules.
+- `/action-board`: assign and close corrections with evidence.
+- `/attention`: failed checks, stale evidence and overdue work.
+- `/review-use`: record the owner's evidence for a particular purpose and checked extract.
+- `/weekly-review`: a draft from the week, attention and action board.
+- `/draft-quality-brief`: one dataset's rules, gaps, corrections and history.
+- `/compliance`: inspect record-level evidence gaps with sources in [the compliance guide](docs/compliance.md).
 
-## The commands
+Every CLI command supports `--json`. Use `node scripts/quality.mjs help` for arguments. Names match without case sensitivity, UUID prefixes work, and ambiguous references list candidates and exit 1. Every mutation needs `--actor='Your name'`. That is a recorded label, not an authenticated identity.
 
-<!-- TODO(author): a table of the slash commands in .claude/commands and what each one does. -->
-
-| Command | What it does |
-|---|---|
-| `/...` | ... |
-
-## Instead of DQOps
-
-<!-- TODO(author): how to bring data across from DQOps; link docs/replace-dqops.md -->
-
-## Architecture
-
-```
-data-quality-for-claude-code/
-  CLAUDE.md                 how the operator wants this run (routing table + house rules)
-  AGENTS.md                 the same, for Codex / OpenCode / Cursor / Gemini CLI
-  .claude/commands/         the slash commands
-  scripts/                  the CLI the commands drive
-  scripts/lib/db.mjs        one adapter: DATABASE_URL (pg) or embedded PGlite
-  supabase/migrations/      plain SQL schema
-  supabase/seed.sql         demo data
-  docs/                     the thesis and the migration guide
+```bash
+node scripts/quality.mjs check-file ORDERS examples/orders.csv --actor='Demo operator'
+node scripts/quality.mjs import dqops examples/dqops-results.json --dataset=CONTACTS --source=demo/public/contacts --actor='Demo operator' --dry-run
+node scripts/quality.mjs import dqops examples/dqops-results.json --dataset=CONTACTS --source=demo/public/contacts --actor='Demo operator'
+node scripts/quality.mjs export --out=quality-export.json
 ```
 
-## Built for coding agents
+Import reads the saved JSON response from DQOps' documented check-results endpoint. Export the required date range and groups first. No live credentials or network calls are made by this CLI. [Full switching guide](docs/replace-dqops.md).
 
-The database, CLI and command recipes work with Claude Code, Codex, OpenCode or Cursor. Ask your coding agent for a new command and have it implement and test the change against the same records.
+## What a check means
 
-## Contributing
+Supported rules: row count, missing values, duplicate values, numeric range, allowed values and timestamp freshness. Bounds are inclusive. Duplicate counts count repeated occurrences after the first. Values are case-sensitive. Blank numeric values fail. Freshness rejects invalid dates and future dates. A malformed CSV or missing required column fails the whole run. An empty extract never records a passing run. No raw business rows or failing values are saved, only file hash, counts, outcomes and rule definitions. The source file stays where you put it.
 
-Issues and pull requests are welcome. Keep the shape: plain SQL, a small CLI, a slash command per recurring job, no front end.
+A use review requires a recent local batch, unchanged active rules, passing results, a current governance review, a named owner, a purpose and no open corrections. Its expiry is based on the batch's age, not the review time. A new batch or changed purpose requires another use review. Imported history cannot satisfy this gate. These are conservative house rules, not legal thresholds. The owner still assesses accuracy against the real world, relevance and whether the information is misleading.
 
-## Want it installed and run for you?
+## Ten questions to ask
 
-Enterprise DNA installs Data Quality for Claude Code for your business, migrates your DQOps data, connects it to the rest of your tools, and runs it for you as part of **Omni**, our managed Command Center. One setup fee, then a monthly retainer.
+These are implemented by `insights`. They combine your rules, reviews and corrections. No claim is made that another product cannot answer them.
 
-- Book a call: [enterprisedna.co/omni/book](https://enterprisedna.co/omni/book/?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=dqops)
-- Read more: [enterprisedna.co/omni/instead-of/dqops](https://enterprisedna.co/omni/instead-of/dqops?utm_source=github&utm_medium=readme&utm_campaign=dqops)
+1. Which datasets have no recent local check?
+2. Which active rules changed after the latest run?
+3. Which personal-data datasets lack use-review evidence?
+4. Which corrective actions are overdue?
+5. Which owners have unresolved actions?
+6. Which current rules fail in the latest extract?
+7. Which datasets contain history but no local test?
+8. Which datasets need governance review?
+9. Which datasets have no active quality rules?
+10. Which failed checks recur in recorded history?
 
-## License
+## Documents and views
 
-MIT. Copyright (c) 2026 Enterprise DNA.
+`brand.json` sets the business name, logo and colours. `npm run docs` renders quality review records, corrective action records and check registers. `npm run view` renders the week, attention and latest check outcomes. All HTML is read-only and imported text is escaped. `/new-view` adds a report. No browser application or server is required.
+
+## Your first hour: ten things to ask for
+
+1. Put our business name and colours on the reports.
+2. Register the dataset we use for our Monday report.
+3. Add the owner and the reason we use those records.
+4. Require a unique customer reference.
+5. Find missing contact details without copying them into the results.
+6. Add the status values our team accepts.
+7. Set the maximum age for a fresh check.
+8. Import historical results and reconcile the counts.
+9. Assign an overdue correction to its owner.
+10. Add a business-unit field with `/customise` and a tested migration.
+
+## Operating boundaries
+
+One database per business, trusted internal operators only. No public user access, scheduler, warehouse credentials, source-data correction or outbound sending exists in this base. Configure external scheduling and integrations separately. Row-level security denies untrusted roles by default; database owners can bypass application checks. CLI writes serialize with a transaction lock. Do not expose owner database credentials to end users. Protect exports, drafts and reports as business records. Use a protected local volume and tested native backups. JSON export is portable data, not a tested disaster-recovery backup.
+
+[Compliance sources](docs/compliance.md). [Why no front end](docs/why-no-front-end.md). Tests run in disposable storage and cover all CLI commands, rule boundaries, stale evidence, changed rules, rollback, import idempotence and reports. CI covers Linux and Windows with Node 20/22, plus Postgres. A configured workflow is not proof it has passed; consult its run result.
+
+MIT. DQOps is its owner's trademark. This project is not affiliated with DQOps.

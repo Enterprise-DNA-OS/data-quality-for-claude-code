@@ -1,11 +1,12 @@
 ---
-description: Check the records against the rules this industry lives under (the ones listed in docs/compliance.md) and report what is missing, late, or about to breach, with the rule cited.
+description: "Evidence checks supporting accuracy obligations"
 ---
 
-1. Read `docs/compliance.md`. Each rule has a name, the source it comes from, what a breach looks like in the data, and the SQL or command that finds it.
-2. Run each check. Use the CLI's `--json` output or a direct query through `scripts/lib/db.mjs`.
-3. Report as a table: rule, count, the worst example (name and days), the source. Order by severity: breached first, then due within 7 days, then clean.
-4. For anything breached, draft the fix the operator can approve: the record to update, the notice to send (draft to `drafts/`, never send), or the task to add.
-5. If a rule in `docs/compliance.md` is out of date, say so and stop. Do not guess at law. The operator confirms the rule, then you update the doc and the check together.
+Read CLAUDE.md. Use the single CLI for this job.
 
-Nothing here is legal advice. The doc records the rules the operator has told the system to enforce, with sources, and this command checks the data against them.
+1. Run `node scripts/quality.mjs help --json` if the arguments are unclear. This job is `compliance`: Evidence checks supporting accuracy obligations.
+2. Resolve the intended dataset or rule from current records. If a reference is ambiguous, show the candidates and get the operator's selection. Never guess.
+3. Run `node scripts/quality.mjs compliance` with the operator's arguments. Mutations need `--actor` and the named evidence or purpose. For imports, run `--dry-run` first, reconcile source coverage, then apply the authorised import.
+4. Present the result in plain language. Label demo records as fictional. An evidence review is not legal clearance. Nothing sends or publishes. Drafts stay in drafts/.
+
+Use `--json` for machine-readable output. A nonzero exit means the job did not complete. Do not treat imported history as a fresh check.
