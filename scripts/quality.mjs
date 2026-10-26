@@ -41,7 +41,7 @@ const sha=x=>createHash('sha256').update(x).digest('hex');
 const stable=x=>JSON.stringify(x,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
 function parse(args){const opts={},pos=[];for(const a of args){if(a.startsWith('--')){const i=a.indexOf('=');const k=a.slice(2,i<0?undefined:i);if(k in opts)throw Error('Duplicate option '+k);opts[k]=i<0?true:a.slice(i+1);}else pos.push(a);}return {opts,pos};}
 const text=(v,label)=>{if(typeof v!=='string'||!v.trim())throw Error('Required '+label);return v.trim();};
-const num=(v,label)=>{if(v===undefined||v===null||v===''||!Number.isFinite(Number(v)))throw Error('Invalid numeric '+label);return Number(v);};
+const num=(v,label)=>{if(!['number','string'].includes(typeof v)||String(v).trim()===''||!Number.isFinite(Number(v)))throw Error('Invalid numeric '+label);return Number(v);};
 const integer=(v,label,min=0,max=100000000)=>{const n=num(v,label);if(!Number.isInteger(n)||n<min||n>max)throw Error('Invalid integer '+label);return n;};
 const bool=v=>{if(!['yes','no'].includes(v))throw Error('Use yes or no');return v==='yes';};
 export function date(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(Date.parse(v))||new Date(v).toISOString().slice(0,10)!==v)throw Error('Use a valid YYYY-MM-DD date');return v;}

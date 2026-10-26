@@ -55,7 +55,12 @@ try{
  const rb=await count('results');eq((await call('import','dqops',fixture,'--dataset=CONTACTS','--source=demo/public/contacts',actor,'--dry-run')).added,2);eq(await count('results'),rb);
  eq((await call('import','dqops',fixture,'--dataset=CONTACTS','--source=demo/public/contacts',actor)).added,2);
  eq((await call('import','dqops',fixture,'--dataset=CONTACTS','--source=demo/public/contacts',actor)).skipped,2);eq((await call('imports')).length,2);
+ await fails(['check-file','TEST',good,actor,'--dryrun'],/Unknown option/);
+ await fails(['check-file','TEST',good,actor,'--dry-run=false'],/takes no value/);
  const source=JSON.parse(fs.readFileSync(fixture,'utf8'));
+ const booleanSeverity=structuredClone(source);booleanSeverity[0].checkResultEntries[0].severity=false;
+ await fails(['import','dqops',write('bool.json',JSON.stringify(booleanSeverity)),'--dataset=CONTACTS','--source=bool',actor],/Invalid numeric/);
+
  const changed=structuredClone(source);changed[0].checkResultEntries[0].actualValue=17;
  await fails(['import','dqops',write('changed.json',JSON.stringify(changed)),'--dataset=CONTACTS','--source=demo/public/contacts',actor],/Changed source/);
  await fails(['import','dqops',fixture,'--dataset=TEST','--source=demo/public/contacts',actor],/mapping/);
