@@ -50,7 +50,12 @@ async function resolve(db,t,ref){text(ref,t+' reference');const rows=await db.qu
 async function event(db,id,actor,action,detail){await db.query('insert into events(subject_id,actor,action,detail) values($1,$2,$3,$4)',[id,actor,action,JSON.stringify(detail)]);}
 async function transaction(db,work,dry=false){await db.exec('BEGIN');try{await db.exec('LOCK TABLE datasets IN SHARE ROW EXCLUSIVE MODE');const r=await work();await db.exec(dry?'ROLLBACK':'COMMIT');return r;}catch(e){await db.exec('ROLLBACK');throw e;}}
 function saveDraft(title,body){const dir=path.resolve(process.env.OUTPUT_DIR||REPO_ROOT,'drafts');fs.mkdirSync(dir,{recursive:true,mode:0o700});const file=path.join(dir,title+'-'+randomUUID()+'.md');fs.writeFileSync(file,body,{flag:'wx',mode:0o600});return {file};}
-function readable(x){if(!Array.isArray(x))return JSON.stringify(x,null,2);if(!x.length)return '(none)';return table(x,Object.keys(x[0]).map(key=>({key,label:key,width:80,format:v=>typeof v==='object'&&v!==null?JSON.stringify(v):String(v??'')})));}
+function readable(x,command){
+ if(!Array.isArray(x))return JSON.stringify(x,null,2);if(!x.length)return '(none)';
+ const columns={'quality-week':['code','owner','last_checked','blockers','open_actions'],'check-results':['dataset','check_name','origin','actual_value','failed_rows','severity'],'action-board':['code','dataset','name','owner','due','status']};
+ const format=v=>v instanceof Date?v.toISOString().slice(0,16).replace('T',' ')+'Z':typeof v==='boolean'?(v?'Yes':'No'):typeof v==='object'&&v!==null?JSON.stringify(v):String(v??'');
+ return table(x,(columns[command]||Object.keys(x[0])).map(key=>({key,label:key.replaceAll('_',' '),width:65,format})));
+}
 export function evaluate(rule,rows,now=new Date()){
  const values=rows.map(r=>r[rule.field]);
  if(rule.kind!=='row_count' && rows.length && !Object.hasOwn(rows[0],rule.field))throw Error('Missing CSV column '+rule.field);
@@ -159,5 +164,5 @@ export async function run(db,args){
  },!!o['dry-run']);
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
- let db;try{db=await getDb();const result=await run(db,process.argv.slice(2));console.log(process.argv.includes('--json')?JSON.stringify(result,null,2):readable(result));}catch(e){console.error(JSON.stringify({error:e.message}));process.exitCode=1;}finally{if(db)await db.close();}
+ let db;try{db=await getDb();const result=await run(db,process.argv.slice(2));console.log(process.argv.includes('--json')?JSON.stringify(result,null,2):readable(result,process.argv.slice(2).find(a=>!a.startsWith('--'))));}catch(e){console.error(JSON.stringify({error:e.message}));process.exitCode=1;}finally{if(db)await db.close();}
 }

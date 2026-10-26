@@ -1,23 +1,23 @@
 Fictional demo captured 2026-10-26
 
 $ node scripts/quality.mjs quality-week
-  code      name                     owner  personal  review_due  row_count  last_checked                blockers  open_actions
-  --------  -----------------------  -----  --------  ----------  ---------  --------------------------  --------  ------------
-  CONTACTS  Customer contact export  Aroha  true      2026-10-23  2          "2026-10-26T03:02:39.051Z"  4         1           
-  ORDERS    Wholesale order export   Ben    false     2026-11-25  3          "2026-10-26T03:02:39.077Z"  2         0           
-  STOCK     Warehouse stock export   Aroha  false     2026-11-25                                         3         1
+  code      owner  last checked       blockers  open actions
+  --------  -----  -----------------  --------  ------------
+  CONTACTS  Aroha  2026-10-26 03:02Z  4         1           
+  ORDERS    Ben    2026-10-26 03:02Z  2         0           
+  STOCK     Aroha                     3         1
 
 $ node scripts/quality.mjs check-results
-  dataset   check_name  origin  measured_at                 actual_value  failed_rows  severity
-  --------  ----------  ------  --------------------------  ------------  -----------  --------
-  ORDERS    O-COUNT     local   "2026-10-26T03:02:39.077Z"  3             0            0       
-  ORDERS    O-QUANTITY  local   "2026-10-26T03:02:39.077Z"  1             1            2       
-  ORDERS    O-STATUS    local   "2026-10-26T03:02:39.077Z"  1             1            1       
-  CONTACTS  C-EMAIL     local   "2026-10-26T03:02:39.051Z"  1             1            2       
-  CONTACTS  C-ID        local   "2026-10-26T03:02:39.051Z"  1             1            3
+  dataset   check name  origin  actual value  failed rows  severity
+  --------  ----------  ------  ------------  -----------  --------
+  ORDERS    O-COUNT     local   3             0            0       
+  ORDERS    O-QUANTITY  local   1             1            2       
+  ORDERS    O-STATUS    local   1             1            1       
+  CONTACTS  C-EMAIL     local   1             1            2       
+  CONTACTS  C-ID        local   1             1            3
 
 $ node scripts/quality.mjs action-board
-  code     dataset   name                                         owner  due         status  evidence
-  -------  --------  -------------------------------------------  -----  ----------  ------  --------
-  ACT-101  CONTACTS  Reconcile duplicate contact references       Aroha  2026-10-24  open            
+  code     dataset   name                                         owner  due         status
+  -------  --------  -------------------------------------------  -----  ----------  ------
+  ACT-101  CONTACTS  Reconcile duplicate contact references       Aroha  2026-10-24  open  
   ACT-102  STOCK     Confirm stock extract arrives before review  Ben    2026-10-28  open
